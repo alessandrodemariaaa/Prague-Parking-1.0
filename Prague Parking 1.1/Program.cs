@@ -103,7 +103,7 @@ namespace PragueParking
         Console.Clear();
         Console.Write("Ange registreringsnummer för fordonet som ska flyttas: ");
         string regnr = Console.ReadLine()?.Trim().ToUpper();
-        
+
         int fromIndex = FindVehicleIndex(regnr);
 
         if (fromIndex == -1)
@@ -157,7 +157,12 @@ namespace PragueParking
             else
             {
                 Console.WriteLine("Platsen är upptagen.");
+                parkingSpots[fromIndex] = Appendtospot(parkingSpots[fromIndex], vehicle);
+                Pause();
             }
+        }
+    }
+
 
 
 
