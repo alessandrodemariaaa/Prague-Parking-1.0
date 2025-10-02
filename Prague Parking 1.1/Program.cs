@@ -1,13 +1,12 @@
-﻿using system;
-using System.ComponentModel.Design;
+﻿using System;
 
 namespace PragueParking
-
-    class program
+{
+    class Program
 {
     static string[] parkingSpots = new string[100];
 
-        static void main(string[] args)
+        static void Main(string[] args)
     {
         bool running = true;
 
@@ -54,7 +53,7 @@ namespace PragueParking
         Console.WriteLine("Ange ett registreringsnummer (max 10 tecken): ");
         string regnr = Console.ReadLine()?.Trim().ToUpper();
 
-        if ((string.IsNullOrWhiteSpace(regnr) || regnr.Length > 100)
+        if (string.IsNullOrWhiteSpace(regnr) || regnr.Length > 10)
         {
             Console.WriteLine("Ogiltligt registreringnummer.");
             Pause();
@@ -68,7 +67,7 @@ namespace PragueParking
             return;
         }
 
-        for (int i = 0; < parkingSpots.Length; i++)
+        for (int i = 0; i < parkingSpots.Length; i++)
         {
             String spot = parkingSpots[i];
 
@@ -77,7 +76,7 @@ namespace PragueParking
                 if (string.IsNullOrEmpty(spot))
                 {
                     parkingSpots[i] = $"CAR: {regnr}";
-                    Console.WriteLine($"Bilen {regnr} parkerades på¨plats {i + 1}");
+                    Console.WriteLine($"Bil {regnr} parkerades på¨plats {i + 1}");
                     Pause();
                     return;
 
@@ -88,14 +87,14 @@ namespace PragueParking
                 if (string.IsNullOrEmpty(spot))
                 {
                     parkingSpots[i] = $"MC: {regnr}";
-                    Console.WriteLine($"MC {regnr} dubbelparkerades på plats {i + 1}");
+                    Console.WriteLine($"MC {regnr} parkerades på plats {i + 1}");
                     Pause();
                     return;
                 }
             }
         }
         Console.WriteLine("Ingen ledig plats hittades.");
-        pause();
+        Pause();
     }
 
     static void MoveVehicle()
@@ -113,7 +112,7 @@ namespace PragueParking
             return;
         }
 
-        Console.WriteLine("Ange ny plats (1-100: ");
+        Console.WriteLine("Ange ny plats (1-100:) ");
         if (!int.TryParse(Console.ReadLine(), out int newSpot) || newSpot < 1 || newSpot > 100)
         {
             Console.WriteLine("Ogiltigt platsnummer.");
@@ -126,7 +125,7 @@ namespace PragueParking
 
         if (vehicle.StartsWith("CAR:"))
         {
-            if ((string.IsNullOrEmpty(parkingSpots[toIndex]))
+            if (string.IsNullOrEmpty(parkingSpots[toIndex]))
             {
                 parkingSpots[toIndex] = vehicle;
                 Console.WriteLine($"Bilen flyttades till plats {newSpot}");
@@ -135,7 +134,6 @@ namespace PragueParking
             else
             {
                 Console.WriteLine("Platsen är upptagen.");
-                // Lägg tillbaka fordonet där det var
                 parkingSpots[fromIndex] = AppendToSpot(parkingSpots[fromIndex], vehicle);
                 Pause();
             }
@@ -148,23 +146,115 @@ namespace PragueParking
                 Console.WriteLine($"MC:n flyttades till plats {newSpot}");
                 Pause();
             }
-            else if (parkingSpots[toIndex].StartsWith("MC:") && (parkingSpots[toIndex].Split(',')Length == 1)
+            else if (parkingSpots[toIndex].StartsWith($"MC:") && parkingSpots[toIndex].Split(',').Length == 1)
             {
                 parkingSpots[toIndex] += $", {vehicle}";
-                Console.WriteLine($"MC:n dubbelparkerades på plats {newSpot}");
+                Console.WriteLine($"MC:n parkerades på plats {newSpot}");
                 Pause();
             }
             else
             {
                 Console.WriteLine("Platsen är upptagen.");
-                parkingSpots[fromIndex] = Appendtospot(parkingSpots[fromIndex], vehicle);
+                parkingSpots[fromIndex] = AppendToSpot(parkingSpots[fromIndex], vehicle);
                 Pause();
             }
         }
     }
 
 
+static void RemoveVehicle()
+    {
+        Console.Clear();
+        Console.Write("Ange registreringsnumret på fordonet som ska tas bort: ");
+        string regnr = Console.ReadLine()?.Trim().ToUpper();
+
+        int index = FindVehicleIndex(regnr);
+        if (index == -1)
+        {
+            Console.WriteLine("Fordonet hittades inte");
+            Pause();
+            return;
+        }
+
+        parkingSpots[index] = RemoveFromSpot(parkingSpots[index], regnr);
+        Console.WriteLine($"Fordonet {regnr} har tagits bort från parkeringen.");
+        Pause();
+    }
+
+    static void SearchVehicle()
+    {
+        Console.Clear();
+        Console.WriteLine("Ange registreringsnumret att söka efter: ");
+        string regnr = Console.ReadLine()?.Trim().ToUpper();
+
+        int index = FindVehicleIndex(regnr);
+        if (index == -1)
+        {
+            Console.WriteLine("Fordonet hittades inte.");
+        }
+        else
+        {
+            Console.WriteLine($"Fordonet {regnr} står på plats {index + 1}");
+        }
+        Pause();
+    }
+
+    static void ShowParking()
+    {
+        Console.Clear();
+        for (int i = 0; i < parkingSpots.Length; i++)
+        {
+            Console.WriteLine($"Plats {i + 1}: {parkingSpots[i]}");
+        }
+        Pause();
+    }
+
+    static int FindVehicleIndex(string regnr)
+    {
+        for (int i = 0; i < parkingSpots.Length; i++)
+        {
+            if (parkingSpots[i] != null && parkingSpots[i].ToUpper().Contains(regnr))
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    static bool VehicleExists(string regnr)
+    {
+        return FindVehicleIndex(regnr) != -1;
+    }
+
+    static string RemoveFromSpot(string spot, string regnr)
+    {
+        string[] vehicles = spot.Split(',');
+        string result = string.Join(",", Array.FindAll(vehicles, v => !v.EndsWith(regnr)));
+        return result;
+    }
+
+    static string ExtractVehicle(int index, string regnr)
+    {
+        string[] vehicles = parkingSpots[index].Split(',');
+        string found = Array.Find(vehicles, v => v.EndsWith(regnr));
+        parkingSpots[index] = RemoveFromSpot(parkingSpots[index], regnr);
+        return found;
+    }
+
+    static string AppendToSpot(string spot, string vehicle)
+    {
+        if (string.IsNullOrEmpty(spot))
+            return vehicle;
+        else return spot + "," + vehicle;
+    }
+
+        static void Pause()
+        {
+            Console.WriteLine("Tryck på valfri tangent för att fortsätta...");
+            Console.ReadKey();
+        }
+    }
+}
 
 
 
-    
