@@ -18,7 +18,7 @@ Textbaserat system för hantering av en parkeringsplats i Prag (valet parking).
 Öppna lösningen i Visual Studio. Tryck **Ctrl + F5** för att köra programmet.
 
 
-LOGGBOK
+**LOGGBOK**
 
 2025-09-25
 Började projektet. Jag läste igenom uppgiften och försökte förstå kraven. Jag var lite förvirrad kring arrayen med 100 platser, men jag tror jag fattar att det är som en lista där varje ruta är en plats.
